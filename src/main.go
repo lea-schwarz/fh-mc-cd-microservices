@@ -10,9 +10,10 @@ import (
 func main() {
 	a := App{}
 
-	println(os.Getenv("APP_DB_USERNAME"))
-	println(os.Getenv("APP_DB_PASSWORD"))
-	println(os.Getenv("APP_DB_NAME"))
+	// $env:APP_DB_USERNAME="postgres"
+	// $env:APP_DB_PASSWORD="geheim"
+	// $env:APP_DB_NAME="postgres"
+	// localhost:8010
 
 	a.Initialize(
 		os.Getenv("APP_DB_USERNAME"),
