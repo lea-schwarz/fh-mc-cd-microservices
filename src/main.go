@@ -8,7 +8,12 @@ import (
 )
 
 func main() {
-	a := App {}
+	a := App{}
+
+	println(os.Getenv("APP_DB_USERNAME"))
+	println(os.Getenv("APP_DB_PASSWORD"))
+	println(os.Getenv("APP_DB_NAME"))
+
 	a.Initialize(
 		os.Getenv("APP_DB_USERNAME"),
 		os.Getenv("APP_DB_PASSWORD"),
