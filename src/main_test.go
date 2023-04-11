@@ -187,3 +187,48 @@ func TestDeleteProduct(t *testing.T) {
     response = executeRequest(req)
     checkResponseCode(t, http.StatusNotFound, response.Code)
 }
+
+func TestDeleteProductsWithEvenId(t *testing.T) {
+    clearTable()
+    addProducts(5)
+
+    req, _ := http.NewRequest("GET", "/product/4", nil)
+    response := executeRequest(req)
+    checkResponseCode(t, http.StatusOK, response.Code) // geht nu
+
+    req, _ = http.NewRequest("DELETE", "/products", nil)
+    response = executeRequest(req)
+
+    checkResponseCode(t, http.StatusOK, response.Code)
+
+    req, _ = http.NewRequest("GET", "/product/4", nil)
+    response = executeRequest(req)
+    checkResponseCode(t, http.StatusNotFound, response.Code)
+}
+
+func TestGetProductsWithNameContaining(t *testing.T) {
+    clearTable()
+    addProducts(5)
+
+    req, _ := http.NewRequest("GET", "/products/oduc", nil)
+    response := executeRequest(req)
+    checkResponseCode(t, http.StatusOK, response.Code)
+
+    // Parse the response body to get the products
+    var products interface{}
+    err := json.Unmarshal(response.Body.Bytes(), &products)
+    if err != nil {
+        t.Fatalf("Failed to unmarshal response body: %s", err)
+    }
+
+    // Convert the interface{} to a slice of maps
+    productsList, ok := products.([]interface{})
+    if !ok {
+        t.Fatalf("Failed to convert response body to slice of maps")
+    }
+
+    // Check if exactly 5 products are returned
+    if len(productsList) != 5 {
+        t.Errorf("Expected 5 products, got %d", len(productsList))
+    }
+}

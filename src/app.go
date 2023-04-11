@@ -4,11 +4,11 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
-	"encoding/json"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -151,10 +151,34 @@ func (a *App) deleteProduct(w http.ResponseWriter, r *http.Request) {
     respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+func (a *App) getProductsWithNameContaining(w http.ResponseWriter, r *http.Request) {
+    vars := mux.Vars(r)
+    str := vars["str"]
+
+	products, err := getProductsWithNameContaining(a.DB, str)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, products)
+}
+
+func (a *App) deleteProductsWithEvenId(w http.ResponseWriter, r *http.Request) {
+    if err := deleteProductsWithEvenId(a.DB); err != nil {
+        respondWithError(w, http.StatusInternalServerError, err.Error())
+        return
+    }
+
+    respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
 func (a *App) initializeRoutes() {
     a.Router.HandleFunc("/products", a.getProducts).Methods("GET")
     a.Router.HandleFunc("/product", a.createProduct).Methods("POST")
     a.Router.HandleFunc("/product/{id:[0-9]+}", a.getProduct).Methods("GET")
     a.Router.HandleFunc("/product/{id:[0-9]+}", a.updateProduct).Methods("PUT")
     a.Router.HandleFunc("/product/{id:[0-9]+}", a.deleteProduct).Methods("DELETE")
+    a.Router.HandleFunc("/products/{str:[a-zA-Z]+}", a.getProductsWithNameContaining).Methods("GET")
+    a.Router.HandleFunc("/products", a.deleteProductsWithEvenId).Methods("DELETE")
 }

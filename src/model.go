@@ -4,6 +4,7 @@ package main
 
 import (
 	"database/sql"
+    "strings"
 )
 
 type product struct {
@@ -65,4 +66,62 @@ func getProducts(db *sql.DB, start, count int) ([]product, error) {
     }
 
     return products, nil
+}
+
+func getProductsWithNameContainingLea(db *sql.DB, str string) ([]product, error) {
+	rows, err := db.Query(
+        "SELECT id, name,  price FROM products WHERE name LIKE '%$1%'",
+        str)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	products := []product{}
+
+	for rows.Next() {
+		var p product
+		if err := rows.Scan(&p.ID, &p.Name, &p.Price); err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
+
+	return products, nil
+}
+
+func getProductsWithNameContaining(db *sql.DB, str string) ([]product, error) {
+	if str != "" {
+		str = "%" + strings.ToLower(str) + "%"
+	}
+
+	rows, err := db.Query(
+		"SELECT id, name,  price FROM products WHERE ($1 = '' OR LOWER(name) like $1)",
+		str)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	products := []product{}
+
+	for rows.Next() {
+		var p product
+		if err := rows.Scan(&p.ID, &p.Name, &p.Price); err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
+
+	return products, nil
+}
+
+func deleteProductsWithEvenId(db *sql.DB) error {
+    _, err := db.Exec("DELETE FROM products WHERE id % 2 = 0")
+
+    return err
 }
