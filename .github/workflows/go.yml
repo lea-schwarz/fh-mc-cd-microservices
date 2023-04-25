@@ -1,37 +1,37 @@
 
 on: [push, pull_request]
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Start PostgreSQL
-      run: docker-compose -f "docker-compose.yml" up -d
-      env:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout code
+        uses: actions/checkout@v3
+        
+        - name: Start PostgreSQL
+        run: docker-compose -f "docker-compose.yml" up -d
+        env:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
 
-    - name: Wait for PostgreSQL to start
-      run: docker-compose -f docker-compose.yml exec -T postgres /bin/sh -c 'while ! nc -z localhost 5432; do sleep 1; done;'
-      
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.19
+        - name: Wait for PostgreSQL to start
+        run: docker-compose -f docker-compose.yml exec -T postgres /bin/sh -c 'while ! nc -z localhost 5432; do sleep 1; done;'
+        
+        - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+            go-version: 1.19
 
-    - name: Build
-      run: go build -v ./...
+        - name: Build
+        run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
-      env:
-        APP_DB_USERNAME: postgres
-        APP_DB_PASSWORD: postgres
-        APP_DB_NAME: postgres
-      
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        - name: Test
+        run: go test -v ./...
+        env:
+            APP_DB_USERNAME: postgres
+            APP_DB_PASSWORD: postgres
+            APP_DB_NAME: postgres
+        
+        - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
