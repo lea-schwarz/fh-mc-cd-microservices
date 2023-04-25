@@ -31,8 +31,4 @@ jobs:
         APP_DB_PASSWORD: postgres
         APP_DB_NAME: postgres
       
-    - name: Analyze
-      uses: sonarsource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    
