@@ -31,4 +31,7 @@ jobs:
         APP_DB_PASSWORD: postgres
         APP_DB_NAME: postgres
       
-    
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
